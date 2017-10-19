@@ -116,12 +116,21 @@ if !exists('g:memolist_delimiter_yaml_end')
   let g:memolist_delimiter_yaml_end  = "- - -"
 endif
 
+if !exists('g:memolist_file_name_prefix_date_style')
+" let g:memolist_file_name_prefix_date_style = '%Y' . g:memolist_title_replacement . '%m' . g:memolist_title_replacement . '%d' . g:memolist_title_replacement
+  let g:memolist_file_name_prefix_date_style = '%Y-%m-%d-'
+endif
+
+if !exists('g:memolist_title_replacement')
+  let g:memolist_title_replacement = '-'
+endif
+
 function! s:esctitle(str)
   let str = a:str
   let str = tolower(str)
-  let str = substitute(str, g:memolist_title_pattern, '-', 'g')
-  let str = substitute(str, '\(--\)\+', '-', 'g')
-  let str = substitute(str, '\(^-\|-$\)', '', 'g')
+  let str = substitute(str, g:memolist_title_pattern, g:memolist_title_replacement, 'g')
+  let str = substitute(str, g:memolist_title_replacement . '\+', g:memolist_title_replacement, 'g')
+  let str = substitute(str, '\(^' . g:memolist_title_replacement . '\|' . g:memolist_title_replacement . '$\)', '', 'g')
   return str
 endfunction
 
@@ -222,7 +231,7 @@ function! memolist#new_with_meta(title, tags, categories)
   if get(g:, 'memolist_filename_prefix_none', 0) != 0
     let file_name = s:esctitle(items['title'])
   else
-    let file_name = strftime("%Y-%m-%d-") . s:esctitle(items['title'])
+    let file_name = strftime(g:memolist_file_name_prefix_date_style) . s:esctitle(items['title'])
   endif
   if stridx(items['title'], '.') == -1
     let file_name = file_name . "." . g:memolist_memo_suffix
